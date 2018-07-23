@@ -21,3 +21,10 @@ export function setLink(link){
     payload: link,
   }
 }
+
+export function setLogs(logs){
+  return{
+    type: 'update_logs',
+    payload: logs,
+  }
+}

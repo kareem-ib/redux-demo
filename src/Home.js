@@ -10,17 +10,37 @@ import Notifications, {
   hide,
   removeAll,
 } from 'react-notification-system-redux'
-
-import { setName, setAge, setLink } from './actions'
+import Ethjs from 'ethjs'
+import eip20JSON from './EIP20.json'
+import parameterizerJSON from './Parameterizer.json'
+import registryJSON from './Registry.json'
+import plcrvotingJSON from './PLCRVoting.json'
+import EthAbi from 'ethjs-abi'
+import { setName, setAge, setLink, setLogs } from './actions'
 
 class Home extends Component {
+  updateEthLogs = async () => {
+    const eth = new Ethjs(window.web3.currentProvider)
+    const filter = {
+      fromBlock: '0',
+      toBlock: 'latest',
+      address: '0x73064ef6b8aa6d7a61da0eb45e53117718a3e891',
+      topics: [],
+    }
+    const logs = await eth.getLogs(filter)
+    const decoder = EthAbi.logDecoder(eip20JSON.abi)
+    const events = decoder(logs)
+    this.props.onDispatchSetLogs(setLogs(events))
+  }
+  
   state = {
     name: '',
     age: '',
   }
 
   componentDidMount() {
-    console.log('this.props:', this.props)
+    this.updateEthLogs()
+    setInterval(this.updateEthLogs,5000)
   }
 
   // change the REACT state
@@ -73,7 +93,7 @@ class Home extends Component {
         }
     }
   }
-
+  
   notify(noti, type) {
       switch (type) {
 	  case 'success':
@@ -168,6 +188,10 @@ class Home extends Component {
       });
   }
 
+  generateLogs(){
+  return this.props.logs.map((log,index)=>{return <li key= {log + index}>{log._eventName}</li>})
+  }
+
   /*getMessage(title) {
       switch (title) {
 	  case 'Application added':
@@ -189,11 +213,11 @@ class Home extends Component {
 
   render() {
     //let l = this.generateButtons(0, '', '', '');
+    let logs = this.generateLogs()
     let list = this.generateButtons(0, 'Application added', 'Application whitelisted', 'Application removed', 'Application challenged', 'Listing challenged', 'Your vote won!', 'Your vote lost!', 'Transaction failed');
     return (
       <div>
         <div>Home Component</div>
-
         <input value={this.state.name} onChange={this.handleChangeName} />
         <button onClick={this.handleClickSetName}>Set name</button>
 
@@ -205,8 +229,8 @@ class Home extends Component {
 
         {this.props.name === 'isaac' ? (
           <div>NAME IS ISAAC</div>
-        ) : this.props.name === 'kareem' ? (
-          <div>NAME IS KAREEM</div>
+        ) : this.props.name === 'wes' ? (
+          <div>NAME IS WES</div>
         ) : (
           this.props.name !== '' && <div>NAME IS SOMETHING ELSE</div>
         )}
@@ -229,6 +253,7 @@ class Home extends Component {
         {`there are ${this.props.notifications.length} notifications`}
 
         <Notifications notifications={this.props.notifications} />
+        <ul>{logs}</ul>
       </div>
     )
   }
@@ -240,6 +265,7 @@ function mapDispatchToProps(dispatch) {
     onDispatchSetAge: age => dispatch(setAge(age)),
     onDispatchNotification: notification => dispatch(notification),
     onDispatchSetLink: link => dispatch(link),
+    onDispatchSetLogs: logs => dispatch(logs),
   }
 }
 
@@ -249,6 +275,7 @@ function mapStateToProps(state) {
     age: state.home.age,
     notifications: state.notifications,
     link: state.link,
+    logs: state.logs.logs,
   }
 }
 
