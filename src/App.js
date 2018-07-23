@@ -4,13 +4,16 @@ import { Provider } from 'react-redux'
 import { reducer as notificationsReducer } from 'react-notification-system-redux'
 
 import Home from './Home'
-import { homeReducer } from './reducers'
+import { homeReducer, recentsTab, stateChanger } from './reducers'
 import './App.css'
+
 
 function createReducer() {
   return combineReducers({
     notifications: notificationsReducer,
     home: homeReducer,
+    recents: recentsTab,
+    link: stateChanger,
   })
 }
 

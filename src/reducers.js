@@ -21,3 +21,21 @@ export function homeReducer(state = initialState, action) {
       return state
   }
 }
+
+export function recentsTab(state = [], action){
+  switch(action.type){
+    case 'RNS_SHOW_NOTIFICATION':
+      return [...state, {title: action.title, link: action.onRemove}]
+    default :
+      return state
+  }
+}
+
+export function stateChanger(state = [], action){
+  switch(action.type){
+    case 'links':
+      return [...state, action.payload]
+    default :
+      return state
+  }
+}

@@ -11,7 +11,7 @@ import Notifications, {
   removeAll,
 } from 'react-notification-system-redux'
 
-import { setName, setAge } from './actions'
+import { setName, setAge, setLink } from './actions'
 
 class Home extends Component {
   state = {
@@ -151,6 +151,13 @@ class Home extends Component {
         position: 'tl',
         autoDismiss: 0,
         dismissible: 'click',
+        onRemove:() => this.props.onDispatchSetLink(setLink(title)),
+        action: {
+          label: 'More info',
+          callback: function(){
+            alert('here is more info')
+          }
+        }
     });
   }
 
@@ -232,6 +239,7 @@ function mapDispatchToProps(dispatch) {
     onDispatchSetName: name => dispatch(setName(name)),
     onDispatchSetAge: age => dispatch(setAge(age)),
     onDispatchNotification: notification => dispatch(notification),
+    onDispatchSetLink: link => dispatch(link),
   }
 }
 
@@ -240,6 +248,7 @@ function mapStateToProps(state) {
     name: state.home.name,
     age: state.home.age,
     notifications: state.notifications,
+    link: state.link,
   }
 }
 

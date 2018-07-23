@@ -14,3 +14,10 @@ export function setName(name) {
     payload: name,
   }
 }
+
+export function setLink(link){
+  return {
+    type: 'links',
+    payload: link,
+  }
+}
