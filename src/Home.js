@@ -74,22 +74,115 @@ class Home extends Component {
     }
   }
 
+  notify(noti, type) {
+      switch (type) {
+	  case 'success':
+	      this.props.onDispatchNotification(success(noti));
+	      break;
+	  case 'info':
+	      this.props.onDispatchNotification(info(noti));
+	      break;
+	  case 'warning':
+	      this.props.onDispatchNotification(warning(noti));
+	      break;
+	  case 'error':
+	      this.props.onDispatchNotification(error(noti));
+	      break;
+	  default:
+	      console.log('ERROR IN CALLING this.notify()');
+      }
+  }
+
+  submitNoti(noti) {
+      switch (noti.title) {
+	  case 'Application added':
+	      noti.title = 'Application `title` applied';
+	      noti.message = 'Click to review the listing';
+	      this.notify(noti, 'success');
+	      break;
+	  case 'Your vote won!':
+	      noti.title = 'Your vote in `pollId` won!';
+	      noti.message = 'Click to claim your reward.';
+	      this.notify(noti, 'success');
+	      break;
+	  case 'Application whitelisted':
+	      noti.title = 'Application `title` was added to the registry';
+	      noti.message = 'Click to review the listing';
+	      this.notify(noti, 'info');
+	      break;
+	  case 'Application challenged':
+	      noti.title = 'Application `title` was challenged';
+	      noti.message = 'Click to vote';
+	      this.notify(noti, 'info');
+	      break;
+	  case 'Listing challenged':
+	      noti.title = 'Listing `title` was challenged';
+	      noti.message = 'Click to vote';
+	      this.notify(noti, 'info');
+	      break;
+	  case 'Your vote lost!':
+	      noti.title = 'Your vote in `pollId` lost!';
+	      noti.message = 'Votes in favor of listing:`_votes`\nVotes against listing: `_votes`';
+	      this.notify(noti, 'error');
+	      break;
+	  case 'Transaction failed':
+	      noti.title = 'Transaction `txHash` failed!';
+	      noti.message = 'View `txHash` on Etherscan';
+	      this.notify(noti, 'error');
+	      break;
+	  case 'Application removed':
+	      noti.title = 'Application `title` removed';
+	      noti.message = 'View application `title` history';
+	      this.notify(noti, 'error');
+	      break;
+	  default:
+	      console.log('ERROR IN submitNoti()');
+      }
+  }
+
   // get notification details,
   // dispatch an action that is handled by the notifications reducer,
   // and ultimately changes the REDUX store
-  handleClickNotification = type => {
-    const noti = this.getNotificationDetails(type)
-
-    if (noti.title === 'Application') {
-      this.props.onDispatchNotification(success(noti))
-    } else if (noti.title === 'Challenge') {
-      this.props.onDispatchNotification(warning(noti))
-    } else {
-      this.props.onDispatchNotification(error(noti))
-    }
+  handleClickNotification = (title, message='generic message') => {
+    this.submitNoti({
+        uid: this.props.notifications.length + 1,
+        title,
+        message,
+        position: 'tl',
+        autoDismiss: 0,
+        dismissible: 'click',
+    });
   }
 
+  generateButtons(i, ...names) {
+      console.log(i++);
+      return names.map((title, index) => {
+	  return <button onClick={e => this.handleClickNotification(title)} key={title + index}>{title}</button>
+      });
+  }
+
+  /*getMessage(title) {
+      switch (title) {
+	  case 'Application added':
+	  case 'Your vote won!':
+	    this.props.onDispatchNotification(success(noti));
+	    break;
+	  case 'Applciation whitelisted':
+	  case 'Application challenged':
+	  case 'Listing challenged':
+	    this.props.onDispatchNotification(info(noti));
+	    break;
+	  case 'Your vote lost!':
+	  case 'Transaction failed':
+	  case 'Application removed':
+	  default:
+	    this.props.onDispatchNotification(error(noti));
+      }
+  }*/
+
   render() {
+    //let l = this.generateButtons(0, '', '', '');
+    let list = this.generateButtons(0, 'Application added', 'Application whitelisted', 'Application removed', 'Application challenged', 'Listing challenged', 'Your vote won!', 'Your vote lost!', 'Transaction failed');
     return (
       <div>
         <div>Home Component</div>
@@ -99,12 +192,9 @@ class Home extends Component {
 
         <input value={this.state.age} onChange={this.handleChangeAge} />
         <button onClick={this.handleClickSetAge}>Set age</button>
-
-        <div onClick={e => this.handleClickNotification('Application')}>Application</div>
-        <div onClick={e => this.handleClickNotification('Challenge')}>Challenge</div>
-
-        <br />
-        <br />
+	{list}
+	{/*<div onClick={e => this.handleClickNotification('Application')}>Application</div>
+	<div onClick={e => this.handleClickNotification('Challenge')}>Challenge</div> */}
 
         {this.props.name === 'isaac' ? (
           <div>NAME IS ISAAC</div>
