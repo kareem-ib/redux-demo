@@ -22,9 +22,10 @@ export function setLink(link){
   }
 }
 
-export function setLogs(logs){
+export function setLogs(latestBlock, logs){
   return{
     type: 'update_logs',
-    payload: logs,
+    latestBlock, 
+    logs,
   }
 }

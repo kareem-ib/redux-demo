@@ -41,12 +41,13 @@ export function stateChanger(state = [], action){
   }
 }
 
-export function logsReducer(state = {logs: []}, action){
+export function logsReducer(state = {logs: [], latestBlock: '0'}, action){
   switch(action.type){
     case 'update_logs':
       return {
         ...state, 
-        logs: action.payload
+        latestBlock: action.latestBlock,
+        logs: action.logs
       }
     default :
       return state

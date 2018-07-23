@@ -22,15 +22,16 @@ class Home extends Component {
   updateEthLogs = async () => {
     const eth = new Ethjs(window.web3.currentProvider)
     const filter = {
-      fromBlock: '0',
+      fromBlock: this.props.latestBlock,
       toBlock: 'latest',
       address: '0x73064ef6b8aa6d7a61da0eb45e53117718a3e891',
       topics: [],
     }
+    const Latest = (await eth.blockNumber()).toString()
     const logs = await eth.getLogs(filter)
     const decoder = EthAbi.logDecoder(eip20JSON.abi)
     const events = decoder(logs)
-    this.props.onDispatchSetLogs(setLogs(events))
+    this.props.onDispatchSetLogs(setLogs(Latest, events))
   }
   
   state = {
@@ -188,9 +189,9 @@ class Home extends Component {
       });
   }
 
-  generateLogs(){
+  /*generateLogs(){
   return this.props.logs.map((log,index)=>{return <li key= {log + index}>{log._eventName}</li>})
-  }
+  }*/
 
   /*getMessage(title) {
       switch (title) {
@@ -213,7 +214,7 @@ class Home extends Component {
 
   render() {
     //let l = this.generateButtons(0, '', '', '');
-    let logs = this.generateLogs()
+    //let logs = this.generateLogs()
     let list = this.generateButtons(0, 'Application added', 'Application whitelisted', 'Application removed', 'Application challenged', 'Listing challenged', 'Your vote won!', 'Your vote lost!', 'Transaction failed');
     return (
       <div>
@@ -253,7 +254,6 @@ class Home extends Component {
         {`there are ${this.props.notifications.length} notifications`}
 
         <Notifications notifications={this.props.notifications} />
-        <ul>{logs}</ul>
       </div>
     )
   }
@@ -276,6 +276,7 @@ function mapStateToProps(state) {
     notifications: state.notifications,
     link: state.link,
     logs: state.logs.logs,
+    latestBlock: state.logs.latestBlock,
   }
 }
 
