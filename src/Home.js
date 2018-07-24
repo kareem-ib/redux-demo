@@ -11,10 +11,12 @@ import Notifications, {
   removeAll,
 } from 'react-notification-system-redux'
 import Ethjs from 'ethjs'
-import eip20JSON from './EIP20.json'
-import parameterizerJSON from './Parameterizer.json'
+//import eip20JSON from './EIP20.json'
+
+//import parameterizerJSON from './Parameterizer.json'
 import registryJSON from './Registry.json'
-import plcrvotingJSON from './PLCRVoting.json'
+//import plcrvotingJSON from './PLCRVoting.json'
+
 import EthAbi from 'ethjs-abi'
 import { setName, setAge, setLink, setLogs } from './actions'
 
@@ -24,13 +26,15 @@ class Home extends Component {
     const filter = {
       fromBlock: this.props.latestBlock,
       toBlock: 'latest',
-      address: '0x73064ef6b8aa6d7a61da0eb45e53117718a3e891',
+      address: '0x39cfbe27e99bafa761dac4566b4af3b4c9cc8fbe',
       topics: [],
     }
     const Latest = (await eth.blockNumber()).toString()
     const logs = await eth.getLogs(filter)
-    const decoder = EthAbi.logDecoder(eip20JSON.abi)
+    const decoder = EthAbi.logDecoder(registryJSON.abi)
     const events = decoder(logs)
+    console.log(events);
+    
     this.props.onDispatchSetLogs(setLogs(Latest, events))
   }
   
@@ -41,7 +45,12 @@ class Home extends Component {
 
   componentDidMount() {
     this.updateEthLogs()
-    setInterval(this.updateEthLogs,5000)
+    setInterval(async () => {
+	await this.updateEthLogs()
+	console.log('ITERATE');
+	this.props.logs.map( (log) =>
+	    this.handleClickNotification(log._eventName) )
+    }, 5000)
   }
 
   // change the REACT state
@@ -116,6 +125,7 @@ class Home extends Component {
 
   submitNoti(noti) {
       switch (noti.title) {
+	  case '_Application':
 	  case 'Application added':
 	      noti.title = 'Application `title` applied';
 	      noti.message = 'Click to review the listing';
@@ -126,16 +136,19 @@ class Home extends Component {
 	      noti.message = 'Click to claim your reward.';
 	      this.notify(noti, 'success');
 	      break;
+	  case '_ApplicationWhitelisted':
 	  case 'Application whitelisted':
 	      noti.title = 'Application `title` was added to the registry';
 	      noti.message = 'Click to review the listing';
 	      this.notify(noti, 'info');
 	      break;
+	  case '_Challenge':
 	  case 'Application challenged':
 	      noti.title = 'Application `title` was challenged';
 	      noti.message = 'Click to vote';
 	      this.notify(noti, 'info');
 	      break;
+	  case '_Challenge':
 	  case 'Listing challenged':
 	      noti.title = 'Listing `title` was challenged';
 	      noti.message = 'Click to vote';
@@ -151,6 +164,7 @@ class Home extends Component {
 	      noti.message = 'View `txHash` on Etherscan';
 	      this.notify(noti, 'error');
 	      break;
+	  case '_ApplicationRemoved':
 	  case 'Application removed':
 	      noti.title = 'Application `title` removed';
 	      noti.message = 'View application `title` history';
@@ -182,8 +196,7 @@ class Home extends Component {
     });
   }
 
-  generateButtons(i, ...names) {
-      console.log(i++);
+  generateButtons(...names) {
       return names.map((title, index) => {
 	  return <button onClick={e => this.handleClickNotification(title)} key={title + index}>{title}</button>
       });
@@ -215,7 +228,7 @@ class Home extends Component {
   render() {
     //let l = this.generateButtons(0, '', '', '');
     //let logs = this.generateLogs()
-    let list = this.generateButtons(0, 'Application added', 'Application whitelisted', 'Application removed', 'Application challenged', 'Listing challenged', 'Your vote won!', 'Your vote lost!', 'Transaction failed');
+    let list = this.generateButtons('Application added', 'Application whitelisted', 'Application removed', 'Application challenged', 'Listing challenged', 'Your vote won!', 'Your vote lost!', 'Transaction failed');
     return (
       <div>
         <div>Home Component</div>
