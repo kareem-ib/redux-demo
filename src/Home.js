@@ -43,6 +43,7 @@ class Home extends Component {
   componentDidMount() {
     this.eth = new Ethjs(window.web3.currentProvider)
     this.getEthLogs()
+    let i=0
     setInterval(async () => {
       const Latest = (await this.eth.blockNumber()).toString()
       console.log('ITERATE');
@@ -52,11 +53,13 @@ class Home extends Component {
       if(this.props.latestBlock !== Latest){
         this.props.onDispatchSetLatestBlock(setLatestBlock(Latest))
         const events = await this.getEthLogs()
-	      this.props.logs.map( (log) =>
-          this.handleClickNotification(log._eventName) 
-        )
-        console.log(Latest, this.props.latestBlock)
         this.props.onDispatchSetLogs(setLogs(events))
+	      this.props.logs.map( (log) =>
+         this.handleClickNotification(log._eventName) 
+        )
+        console.log(i++)
+        console.log(Latest, this.props.latestBlock)
+        
       }
     }, 5000)
   }
