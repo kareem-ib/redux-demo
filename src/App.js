@@ -4,7 +4,7 @@ import { Provider } from 'react-redux'
 import { reducer as notificationsReducer } from 'react-notification-system-redux'
 
 import Home from './Home'
-import { homeReducer, recentsTab, stateChanger, logsReducer } from './reducers'
+import { homeReducer, recentsTab, stateChanger, logsReducer, blockReducer } from './reducers'
 import './App.css'
 
 
@@ -15,6 +15,7 @@ function createReducer() {
     recents: recentsTab,
     link: stateChanger,
     logs: logsReducer,
+    latestBlock: blockReducer,
   })
 }
 

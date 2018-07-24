@@ -18,24 +18,21 @@ import registryJSON from './Registry.json'
 //import plcrvotingJSON from './PLCRVoting.json'
 
 import EthAbi from 'ethjs-abi'
-import { setName, setAge, setLink, setLogs } from './actions'
+import { setName, setAge, setLink, setLogs, setLatestBlock } from './actions'
 
 class Home extends Component {
-  updateEthLogs = async () => {
-    const eth = new Ethjs(window.web3.currentProvider)
+  getEthLogs = async () => {
     const filter = {
       fromBlock: this.props.latestBlock,
       toBlock: 'latest',
       address: '0x39cfbe27e99bafa761dac4566b4af3b4c9cc8fbe',
       topics: [],
     }
-    const Latest = (await eth.blockNumber()).toString()
-    const logs = await eth.getLogs(filter)
+    const logs = await this.eth.getLogs(filter)
     const decoder = EthAbi.logDecoder(registryJSON.abi)
     const events = decoder(logs)
     console.log(events);
-    
-    this.props.onDispatchSetLogs(setLogs(Latest, events))
+    return events
   }
   
   state = {
@@ -44,12 +41,23 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    this.updateEthLogs()
+    this.eth = new Ethjs(window.web3.currentProvider)
+    this.getEthLogs()
     setInterval(async () => {
-	await this.updateEthLogs()
-	console.log('ITERATE');
-	this.props.logs.map( (log) =>
-	    this.handleClickNotification(log._eventName) )
+      const Latest = (await this.eth.blockNumber()).toString()
+      console.log('ITERATE');
+      if(this.props.latestBlock === 'latest'){
+        this.props.onDispatchSetLatestBlock(setLatestBlock(Latest))
+      }
+      if(this.props.latestBlock !== Latest){
+        this.props.onDispatchSetLatestBlock(setLatestBlock(Latest))
+        const events = await this.getEthLogs()
+	      this.props.logs.map( (log) =>
+          this.handleClickNotification(log._eventName) 
+        )
+        console.log(Latest, this.props.latestBlock)
+        this.props.onDispatchSetLogs(setLogs(events))
+      }
     }, 5000)
   }
 
@@ -279,6 +287,7 @@ function mapDispatchToProps(dispatch) {
     onDispatchNotification: notification => dispatch(notification),
     onDispatchSetLink: link => dispatch(link),
     onDispatchSetLogs: logs => dispatch(logs),
+    onDispatchSetLatestBlock: latestBlock => dispatch(latestBlock),
   }
 }
 
@@ -289,7 +298,7 @@ function mapStateToProps(state) {
     notifications: state.notifications,
     link: state.link,
     logs: state.logs.logs,
-    latestBlock: state.logs.latestBlock,
+    latestBlock: state.latestBlock.latestBlock,
   }
 }
 
