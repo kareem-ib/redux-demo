@@ -63,11 +63,7 @@ class Home extends Component {
 
       console.log('ITERATE');
 
-      if (this.props.latestBlock === 'latest') {
-        this.props.onDispatchSetLatestBlock(setLatestBlock(Latest))
-      }
-
-      if (this.props.latestBlock !== Latest) {
+      if (this.props.latestBlock !== Latest || this.props.latestBlock === 'latest') {
         this.props.onDispatchSetLatestBlock(setLatestBlock(Latest))
         
         const events = await this.getEthLogs('Registry') // this.getEthLogs() => {registry: events, plcrevents: plcrevents, eipevents, paramevents}
