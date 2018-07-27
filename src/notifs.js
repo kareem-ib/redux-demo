@@ -29,6 +29,7 @@ export const EventTypes = {
     _RewardClaimed: 'success',
     _ListingRemoved: 'error',
     _ListingWithdrawn: 'info',
+    _TXFailed: 'error',
 }
 
 function getNotiTitleAndMessage(_eventName) {
@@ -77,18 +78,18 @@ function getNotiTitleAndMessage(_eventName) {
             message = 'View `txHash` on Etherscan';
             break;
         default:
-            console.log('ERROR IN getNotiTitleAndMessage()');   
+	    return null;
     }
 
     return {title, message};
   }
 
 export function generateNoti(_eventName, action = () => {}) {
-    const titleAndMessage = getNotiTitleAndMessage(_eventName);
+    const {title, message} = getNotiTitleAndMessage(_eventName);
     return {
         uid: props.notifications.length + 1,
-        title: titleAndMessage.title,
-        message: titleAndMessage.message,
+        title: title,
+        message: message,
         position: 'tl',
         autoDismiss: 0,
         dismissible: 'both',

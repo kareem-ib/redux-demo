@@ -12,7 +12,6 @@ import Notifications, {
 } from 'react-notification-system-redux'
 import Ethjs from 'ethjs'
 import contractJSON from './contractsJSON'
-
 import EthAbi from 'ethjs-abi'
 import { setLink, setLogs, setLatestBlock } from './actions'
 import { generateNoti, notify, EventTypes, setProps } from './notifs'
@@ -52,16 +51,15 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    console.log()
     this.eth = new Ethjs(window.web3.currentProvider)
     this.getEthLogs('Registry')
     this.getEthLogs('PLCRVoting')
     this.getEthLogs('EIP20')
     this.getEthLogs('Parameterizer')
-    setProps(this.props);
 
     setInterval(async () => {
       const Latest = (await this.eth.blockNumber()).toString()
+      setProps(this.props);
 
       console.log('ITERATE');
 
