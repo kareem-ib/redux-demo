@@ -13,7 +13,7 @@ import Notifications, {
 import Ethjs from 'ethjs'
 import contractJSON from './contractsJSON'
 import EthAbi from 'ethjs-abi'
-import { setLink, setLogs, setLatestBlock } from './actions'
+import { setLogs, setLatestBlock } from './actions'
 import { generateNoti, EventTypes, setProps } from './notifs'
 
 class Home extends Component {
@@ -134,7 +134,6 @@ notify(noti, type, callback = function () {}) {
 function mapDispatchToProps(dispatch) {
   return {
     onDispatchNotification: notification => dispatch(notification),
-    onDispatchSetLink: link => dispatch(link),
     onDispatchSetLogs: logs => dispatch(logs),
     onDispatchSetLatestBlock: latestBlock => dispatch(latestBlock),
   }
@@ -143,7 +142,6 @@ function mapDispatchToProps(dispatch) {
 function mapStateToProps(state) {
   return {
     notifications: state.notifications,
-    link: state.link,
     logs: state.logs.logs,
     latestBlock: state.latestBlock.latestBlock,
   }

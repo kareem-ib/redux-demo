@@ -1,10 +1,3 @@
-export function setLink(link){
-  return {
-    type: 'links',
-    payload: link,
-  }
-}
-
 export function setLogs(logs){
   return{
     type: 'update_logs',

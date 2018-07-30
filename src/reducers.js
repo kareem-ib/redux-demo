@@ -11,15 +11,6 @@ export function recentsTab(state = [], action){
   }
 }
 
-export function stateChanger(state = [], action){
-  switch(action.type){
-    case 'links':
-      return [...state, action.payload]
-    default :
-      return state
-  }
-}
-
 export function logsReducer(state = {logs: []}, action){
   switch(action.type){
     case 'update_logs':
