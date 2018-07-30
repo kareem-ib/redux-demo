@@ -5,12 +5,6 @@ import {
     info,
   } from 'react-notification-system-redux'
 
-// Use props values
-let props;
-export function setProps(prop) {
-    props = prop;
-}
-
 // Set type of notification for certain events
 export const EventTypes = {
     _Application: 'info',
@@ -111,12 +105,12 @@ function getNotiTitleAndMessage(_eventName) {
   }
 
 // Create a general notification from an event
-export function generateNoti(_eventName, action = () => {}) {
+export function generateNoti(_eventName, uid, action = () => {}) {
     const {title, message} = getNotiTitleAndMessage(_eventName);
     return {
-        uid: props.notifications.length + 1,
-        title: title,
-        message: message,
+        uid,
+        title,
+        message,
         position: 'tl',
         autoDismiss: 0,
         dismissible: 'both',

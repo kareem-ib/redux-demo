@@ -14,21 +14,24 @@ import Ethjs from 'ethjs'
 import contractJSON from './contractsJSON'
 import EthAbi from 'ethjs-abi'
 import { setLogs, setLatestBlock } from './actions'
-import { generateNoti, EventTypes, setProps } from './notifs'
+import { generateNoti, EventTypes } from './notifs'
 
 class Home extends Component {
   getEthLogs = async (contractName) => {
     const filter = {
-      fromBlock: this.props.latestBlock,
+	fromBlock: this.props.latestBlock === 'latest' ? '0' : this.props.latestBlock,
       toBlock: 'latest',
       address: await this.getAddressFromLogs(contractName),
       topics: [],
     }
-    const logs = await this.eth.getLogs(filter)
+    
+    const rawLogs = await this.eth.getLogs(filter)
+
     const decoder = await EthAbi.logDecoder(contractJSON[contractName].abi)
-    const events = decoder(logs)
-    console.log(events);
-    return events
+
+    const events = decoder(rawLogs)
+    console.log(events, rawLogs);
+    return { rawLogs, events };
   }
 
   getAddressFromLogs = (contractName) => {
@@ -50,7 +53,9 @@ class Home extends Component {
     age: '',
   }
 
+  buttonId = () => { return this.id++; }
   componentDidMount() {
+    this.id = 0;
     this.eth = new Ethjs(window.web3.currentProvider)
     this.getEthLogs('Registry')
     this.getEthLogs('PLCRVoting')
@@ -59,14 +64,13 @@ class Home extends Component {
 
     setInterval(async () => {
       const Latest = (await this.eth.blockNumber()).toString()
-      setProps(this.props);
 
       console.log('ITERATE');
 
       if (this.props.latestBlock !== Latest || this.props.latestBlock === 'latest') {
         this.props.onDispatchSetLatestBlock(setLatestBlock(Latest))
         
-        const events = await this.getEthLogs('Registry') // this.getEthLogs() => {registry: events, plcrevents: plcrevents, eipevents, paramevents}
+        const { rawLogs, events } = await this.getEthLogs('Registry') // this.getEthLogs() => {registry: events, plcrevents: plcrevents, eipevents, paramevents}
         const plcrevents = await this.getEthLogs('PLCRVoting')
         const eipevents = await this.getEthLogs('EIP20')
         const paramevents = await this.getEthLogs('Parameterizer')
@@ -74,7 +78,7 @@ class Home extends Component {
         this.props.onDispatchSetLogs(setLogs([...paramevents, ...eipevents, ...plcrevents, ...events]))
         
         this.props.logs.map((log) => {
-          const noti = generateNoti(log._eventName);
+          const noti = generateNoti(log._eventName, rawLogs.transactionHash);
           this.notify(noti, EventTypes[log._eventName]);
         });
         console.log(Latest, this.props.latestBlock)
@@ -102,11 +106,10 @@ notify(noti, type, callback = function () {}) {
     }
     callback();
 }
-
   generateButtons(...names) {
     return names.map((title, index) => {
       return <button onClick={e => {
-        const noti = generateNoti(title);
+        const noti = generateNoti(title, this.buttonId());
         this.notify(noti, EventTypes[title]);
       }} key={title + index}>{title}</button>
     });
@@ -115,7 +118,6 @@ notify(noti, type, callback = function () {}) {
   render() {
     //let l = this.generateButtons(0, '', '', '');
     //let logs = this.generateLogs()
-    setProps(this.props);
     let list = this.generateButtons('_Application', '_ApplicationWhitelisted', '_ApplicationRemoved', '_Challenge', '_ReparameterizationProposal', '_NewChallenge', '_ChallengeFailed', );
     return (
       <div>
