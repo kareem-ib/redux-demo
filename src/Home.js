@@ -142,8 +142,8 @@ function mapDispatchToProps(dispatch) {
 function mapStateToProps(state) {
   return {
     notifications: state.notifications,
-    logs: state.logs.logs,
-    latestBlock: state.latestBlock.latestBlock,
+    logs: state.logs,
+    latestBlock: state.latestBlock,
   }
 }
 

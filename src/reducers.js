@@ -11,25 +11,19 @@ export function recentsTab(state = [], action){
   }
 }
 
-export function logsReducer(state = {logs: []}, action){
+export function logsReducer(state = [], action){
   switch(action.type){
     case 'update_logs':
-      return {
-        ...state, 
-        logs: action.logs
-      }
+      return action.logs
     default :
       return state
   }
 }
 
-export function blockReducer(state = {latestBlock: 'latest'}, action){
+export function blockTimeReducer(state = 'latest', action){
   switch(action.type){
     case 'update_latest_block':
-      return{
-        ...state,
-        latestBlock: action.latestBlock,
-      }
+      return action.latestBlock
     default:
       return state
   }
