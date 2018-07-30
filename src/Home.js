@@ -30,7 +30,7 @@ class Home extends Component {
 	}
 	
 	const rawLog = await this.eth.getLogs(filter)
-	rawLogs.push(rawLog);
+	rawLogs.push(...rawLog);
 
 	const decoder = await EthAbi.logDecoder(contractJSON[address].abi)
 
@@ -60,7 +60,7 @@ class Home extends Component {
     this.eth = new Ethjs(window.web3.currentProvider)
     this.getEthLogs();
 
-    /*setInterval(async () => {
+    setInterval(async () => {
       const Latest = (await this.eth.blockNumber()).toString()
 
       console.log('ITERATE');
@@ -81,7 +81,7 @@ class Home extends Component {
         });
         console.log(Latest, this.props.latestBlock)
       }
-    }, 5000)*/
+    }, 5000)
   }
 
 // Dispatch a notification based on a given type, accepts a callback
