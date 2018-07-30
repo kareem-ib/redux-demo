@@ -14,7 +14,7 @@ import Ethjs from 'ethjs'
 import contractJSON from './contractsJSON'
 import EthAbi from 'ethjs-abi'
 import { setLink, setLogs, setLatestBlock } from './actions'
-import { generateNoti, notify, EventTypes, setProps } from './notifs'
+import { generateNoti, EventTypes, setProps } from './notifs'
 
 class Home extends Component {
   getEthLogs = async (contractName) => {
@@ -75,18 +75,39 @@ class Home extends Component {
         
         this.props.logs.map((log) => {
           const noti = generateNoti(log._eventName);
-          notify(noti, EventTypes[log._eventName]);
+          this.notify(noti, EventTypes[log._eventName]);
         });
         console.log(Latest, this.props.latestBlock)
       }
     }, 5000)
   }
 
+// Dispatch a notification based on a given type, accepts a callback
+notify(noti, type, callback = function () {}) {
+    switch (type) {
+        case 'success':
+            this.props.onDispatchNotification(success(noti));
+            break;
+        case 'info':
+            this.props.onDispatchNotification(info(noti));
+            break;
+        case 'warning':
+            this.props.onDispatchNotification(warning(noti));
+            break;
+        case 'error':
+            this.props.onDispatchNotification(error(noti));
+            break;
+        default:
+            console.log('ERROR IN CALLING this.notify()');
+    }
+    callback();
+}
+
   generateButtons(...names) {
     return names.map((title, index) => {
       return <button onClick={e => {
         const noti = generateNoti(title);
-        notify(noti, EventTypes[title]);
+        this.notify(noti, EventTypes[title]);
       }} key={title + index}>{title}</button>
     });
   }
@@ -95,7 +116,7 @@ class Home extends Component {
     //let l = this.generateButtons(0, '', '', '');
     //let logs = this.generateLogs()
     setProps(this.props);
-    let list = this.generateButtons('_Application', '_ApplicationWhitelisted', '_ApplicationRemoved', '_Challenge', '_TXFailed', '_ReparameterizationProposal', '_NewChallenge', '_ChallengeFailed', );
+    let list = this.generateButtons('_Application', '_ApplicationWhitelisted', '_ApplicationRemoved', '_Challenge', '_ReparameterizationProposal', '_NewChallenge', '_ChallengeFailed', );
     return (
       <div>
         <div>Home Component</div>

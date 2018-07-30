@@ -1,4 +1,3 @@
-import React, { Component } from 'react'
 import {
     success,
     error,
@@ -6,32 +5,34 @@ import {
     info,
   } from 'react-notification-system-redux'
 
+// Use props values
 let props;
 export function setProps(prop) {
     props = prop;
 }
 
+// Set type of notification for certain events
 export const EventTypes = {
-    _Application: 'success',
-    _ApplicationWhitelisted: 'info',
+    _Application: 'info',
+    _ApplicationWhitelisted: 'success',
     _ApplicationRemoved: 'error',
     _Challenge: 'info',
-    _TransactionFailed: 'error',
-    _Approval: 'success',
     _VoteCommitted: 'info',
     _VoteRevealed: 'info',
-    _TokensRescued: 'info',
     _ReparameterizationProposal: 'info',
     _NewChallenge: 'info',
     _ProposalAccepted: 'info',
     _ChallengeSucceeded: 'info',
     _ChallengeFailed: 'info',
-    _RewardClaimed: 'success',
     _ListingRemoved: 'error',
     _ListingWithdrawn: 'info',
-    _TXFailed: 'error',
+    Approval: 'success',
+    Transfer: 'success',
+    _TokensRescued: 'info',
+    _RewardClaimed: 'success',
 }
 
+// Get a desired notification title and message from an event
 function getNotiTitleAndMessage(_eventName) {
     let title, message;
     switch (_eventName) {
@@ -51,39 +52,65 @@ function getNotiTitleAndMessage(_eventName) {
             title = 'Application `title` was challenged';
             message = 'Click to vote';
             break;
-        case '_TransactionFailed': 
-        case '_Approval': 
-        case '_VoteCommitted': 
-        case '_VoteRevealed': 
-        case '_TokensRescued': 
+        case 'Approval':
+            title = 'Tokens approved';
+            message = 'View on Etherscan';
+            break;
+        case '_VoteCommitted':
+            title = 'Vote successfully committed';
+            message = 'Go to voting for `title`';
+            break;
+        case '_VoteRevealed':
+            title = 'Vote revealed';
+            message = 'Go to voting for `title`';
+            break;
+        case '_TokensRescued':
+            title = 'Tokens successfully rescued';
+            message = 'View token transaction';
         case '_ReparameterizationProposal':
-            title = 'Parameter `name` proposed to be `proposal`';
+            title = 'Parameter `name` proposed to be `proposal`'; // Check if valid parameter?
             message = 'View parameter proposal';
             break;
         case '_NewChallenge':
             title = 'Parameter `name` was challenged';
             message = 'Click to vote';
             break;
-        case '_ProposalAccepted': 
-        case '_ChallengeSucceeded': 
+        case '_ProposalAccepted':
+            title = '`proposal` accepted';
+            message = 'View parameter proposal'; 
+            break;
+        case '_ChallengeSucceeded':
+            title = 'Challenge against `title` succeeded';
+            message = 'View challenge';
+            break;
         case '_ChallengeFailed':
             title = 'Challenge against `name` failed!';
             message = 'Votes in favor of listing:`_votes`\nVotes against listing: `_votes`';
             break;
-        case '_RewardClaimed': 
-        case '_ListingRemoved': 
-        case '_ListingWithdrawn':
-        case '_TXFailed':
-            title = 'Transaction `txHash` failed!';
-            message = 'View `txHash` on Etherscan';
+        case '_RewardClaimed':
+            title = 'Successfully claimed reward';
+            message = 'View token transaction';
             break;
+        case '_ListingRemoved':
+            title = 'Listing `name` removed';
+            message = 'View exit information';
+            break;
+        case '_ListingWithdrawn':
+            title = 'Listing `name` withdrawn';
+            message = '`name` is no longer on the whitelist';
+            break;
+	case 'Transfer':
+	    title = 'Transfer was successful';
+	    message = 'View transfer on Etherscan';
+	    break;
         default:
-	    return null;
+	        console.log('CANT READ', _eventName); 
     }
 
     return {title, message};
   }
 
+// Create a general notification from an event
 export function generateNoti(_eventName, action = () => {}) {
     const {title, message} = getNotiTitleAndMessage(_eventName);
     return {
@@ -97,22 +124,3 @@ export function generateNoti(_eventName, action = () => {}) {
     }
 }
 
-export function notify(noti, type, callback = function () {}) {
-    switch (type) {
-        case 'success':
-            props.onDispatchNotification(success(noti));
-            break;
-        case 'info':
-            props.onDispatchNotification(info(noti));
-            break;
-        case 'warning':
-            props.onDispatchNotification(warning(noti));
-            break;
-        case 'error':
-            props.onDispatchNotification(error(noti));
-            break;
-        default:
-            console.log('ERROR IN CALLING this.notify()');
-    }
-    callback();
-}
