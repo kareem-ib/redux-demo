@@ -17,29 +17,36 @@ import { setLogs, setLatestBlock } from './actions'
 import { generateNoti, EventTypes } from './notifs'
 
 class Home extends Component {
-  getEthLogs = async (contractName) => {
-    const filter = {
-	fromBlock: this.props.latestBlock === 'latest' ? '0' : this.props.latestBlock,
-      toBlock: 'latest',
-      address: await this.getAddressFromLogs(contractName),
-      topics: [],
-    }
-    
-    const rawLogs = await this.eth.getLogs(filter)
+  getEthLogs = () => {
+    // events and rawLogs match indices
+    let events = [];
+    let rawLogs = [];
+    this.getAddresses().map(async (address) => {
+	const filter = {
+	    fromBlock: this.props.latestBlock === 'latest' ? '0' : this.props.latestBlock,
+	  toBlock: 'latest',
+	  address,
+	  topics: [],
+	}
+	
+	const rawLog = await this.eth.getLogs(filter)
+	rawLogs.push(rawLog);
 
-    const decoder = await EthAbi.logDecoder(contractJSON[contractName].abi)
+	const decoder = await EthAbi.logDecoder(contractJSON[address].abi)
 
-    const events = decoder(rawLogs)
-    console.log(events, rawLogs);
+	const ev = decoder(rawLog);
+	events.push(...ev);
+	console.log(events, rawLogs);
+    });
     return { rawLogs, events };
   }
 
+  // Does this need to be its own function?
   getAddresses = () => {
-    return ['0x946184cde118286d46825b866521d0236800c613',
-    '0x39cfbe27e99bafa761dac4566b4af3b4c9cc8fbe',
-    '0xd71498b67c157927b39900b51b13621e9b106769',
-    '0x73064ef6b8aa6d7a61da0eb45e53117718a3e891']
-    }
+    return ['0x946184cde118286d46825b866521d0236800c613', // PLCRVoting
+    '0x39cfbe27e99bafa761dac4566b4af3b4c9cc8fbe', // Registry
+    '0xd71498b67c157927b39900b51b13621e9b106769', // Parameterizer
+    '0x73064ef6b8aa6d7a61da0eb45e53117718a3e891'] // EIP20
   }
 
   state = {
@@ -51,12 +58,9 @@ class Home extends Component {
   componentDidMount() {
     this.id = 0;
     this.eth = new Ethjs(window.web3.currentProvider)
-    this.getEthLogs('Registry')
-    this.getEthLogs('PLCRVoting')
-    this.getEthLogs('EIP20')
-    this.getEthLogs('Parameterizer')
+    this.getEthLogs();
 
-    setInterval(async () => {
+    /*setInterval(async () => {
       const Latest = (await this.eth.blockNumber()).toString()
 
       console.log('ITERATE');
@@ -77,7 +81,7 @@ class Home extends Component {
         });
         console.log(Latest, this.props.latestBlock)
       }
-    }, 5000)
+    }, 5000)*/
   }
 
 // Dispatch a notification based on a given type, accepts a callback
