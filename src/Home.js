@@ -34,17 +34,11 @@ class Home extends Component {
     return { rawLogs, events };
   }
 
-  getAddressFromLogs = (contractName) => {
-    console.log('reg', contractName)
-    switch (contractName) {
-      case ('PLCRVoting'):
-        return '0x946184cde118286d46825b866521d0236800c613'
-      case ('Registry'):
-        return '0x39cfbe27e99bafa761dac4566b4af3b4c9cc8fbe'
-      case ('Parameterizer'):
-        return '0xd71498b67c157927b39900b51b13621e9b106769'
-      case ('EIP20'):
-        return '0x73064ef6b8aa6d7a61da0eb45e53117718a3e891'
+  getAddresses = () => {
+    return ['0x946184cde118286d46825b866521d0236800c613',
+    '0x39cfbe27e99bafa761dac4566b4af3b4c9cc8fbe',
+    '0xd71498b67c157927b39900b51b13621e9b106769',
+    '0x73064ef6b8aa6d7a61da0eb45e53117718a3e891']
     }
   }
 
@@ -77,8 +71,8 @@ class Home extends Component {
         
         this.props.onDispatchSetLogs(setLogs([...paramevents, ...eipevents, ...plcrevents, ...events]))
         
-        this.props.logs.map((log) => {
-          const noti = generateNoti(log._eventName, rawLogs.transactionHash);
+        this.props.logs.map((log, index) => {
+          const noti = generateNoti(log._eventName, rawLogs[index].transactionHash);
           this.notify(noti, EventTypes[log._eventName]);
         });
         console.log(Latest, this.props.latestBlock)
