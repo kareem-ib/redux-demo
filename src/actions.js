@@ -1,13 +1,13 @@
 export function setLogs(logs){
   return{
-    type: 'update_logs',
+    type: 'UPDATE_LOGS',
     logs,
   }
 }
 
 export function setLatestBlock(latestBlock){
   return{
-    type: 'update_latest_block',
+    type: 'UPDATE_LATEST_BLOCK',
     latestBlock,
   }
 }

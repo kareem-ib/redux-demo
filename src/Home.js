@@ -21,9 +21,9 @@ class Home extends Component {
     // events and rawLogs match indices
     let events = [];
     let rawLogs = [];
-    this.getAddresses().map(async (address) => {
+    this.getAddresses().forEach(async (address) => {
 	const filter = {
-	    fromBlock: this.props.latestBlock === 'latest' ? '0' : this.props.latestBlock,
+	  fromBlock: this.props.latestBlock === 'latest' ? '0' : this.props.latestBlock,
 	  toBlock: 'latest',
 	  address,
 	  topics: [],
@@ -68,12 +68,9 @@ class Home extends Component {
       if (this.props.latestBlock !== Latest || this.props.latestBlock === 'latest') {
         this.props.onDispatchSetLatestBlock(setLatestBlock(Latest))
         
-        const { rawLogs, events } = await this.getEthLogs('Registry') // this.getEthLogs() => {registry: events, plcrevents: plcrevents, eipevents, paramevents}
-        const plcrevents = await this.getEthLogs('PLCRVoting')
-        const eipevents = await this.getEthLogs('EIP20')
-        const paramevents = await this.getEthLogs('Parameterizer')
+        const { rawLogs, events } = await this.getEthLogs() // this.getEthLogs() => {registry: events, plcrevents: plcrevents, eipevents, paramevents}
         
-        this.props.onDispatchSetLogs(setLogs([...paramevents, ...eipevents, ...plcrevents, ...events]))
+        this.props.onDispatchSetLogs(setLogs(events))
         
         this.props.logs.map((log, index) => {
           const noti = generateNoti(log._eventName, rawLogs[index].transactionHash);
